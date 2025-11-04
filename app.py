@@ -4,6 +4,7 @@ import google.generativeai as genai
 from datetime import datetime
 from pathlib import Path
 import json
+import re
 
 # Load environment variables from .env file
 load_dotenv()
@@ -36,6 +37,34 @@ LOGS_DIR.mkdir(exist_ok=True)
 
 # In-memory conversation buffer
 conversation = []
+
+# Emoji rules (keyword -> emoji). Order matters (first match wins).
+EMOJI_RULES = [
+    (r"\b(thank|thanks)\b", "🙏"),
+    (r"\b(congrat|congrats|well done|nice job)\b", "🎉"),
+    (r"\b(lol|haha|😂)\b", "😂"),
+    (r"\b(happy|great|good|awesome|fantastic)\b", "😊"),
+    (r"\b(sad|unhappy|depress|down)\b", "😔"),
+    (r"\b(angry|mad|furious)\b", "😠"),
+    (r"\b(love|❤️|like)\b", "❤️"),
+]
+
+def select_emoji(user_text: str, reply_text: str) -> str:
+    """Choose an emoji based on user text and reply text using simple keyword rules.
+
+    Falls back to a thinking emoji for questions and a neutral smiley otherwise.
+    """
+    text = (user_text + " " + (reply_text or "")).lower()
+    # Prefer question mark heuristic
+    if user_text.strip().endswith("?"):
+        return "🤔"
+
+    for pattern, emoji in EMOJI_RULES:
+        if re.search(pattern, text):
+            return emoji
+
+    # default neutral emoji
+    return "😊"
 
 # Small hard-coded FAQ mapping (can be expanded)
 FAQ = {
@@ -110,8 +139,9 @@ while True:
 
         reply = getattr(response, "text", None)
         if reply:
-            print("Chatbot:", reply)
-            conversation.append(f"Bot: {reply}")
+            emoji = select_emoji(user_input, reply)
+            print("Chatbot:", f"{reply} {emoji}")
+            conversation.append(f"Bot: {reply} {emoji}")
         else:
             print("Chatbot: I couldn't generate a response. Try rephrasing your question.")
             conversation.append("Bot: <no response>")
