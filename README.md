@@ -9,6 +9,8 @@ A Python-based chatbot that uses Google's Gemini AI to provide intelligent respo
 - Environment variable support for secure API key management
 - Configurable model parameters
 - Error handling for robust operation
+ - Help command and simple built-in FAQ
+ - Conversation logging: save transcripts to timestamped files in `logs/`
 
 ## Prerequisites
 
