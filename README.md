@@ -11,6 +11,7 @@ A Python-based chatbot that uses Google's Gemini AI to provide intelligent respo
 - Error handling for robust operation
  - Help command and simple built-in FAQ
  - Conversation logging: save transcripts to timestamped files in `logs/`
+ - Emoji replies: the bot appends a context-aware emoji to responses (type normal messages; emoji is chosen by simple keyword heuristics)
 
 ## Prerequisites
 
